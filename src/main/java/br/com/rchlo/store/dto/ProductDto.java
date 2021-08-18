@@ -1,8 +1,13 @@
 package br.com.rchlo.store.dto;
 
 import br.com.rchlo.store.domain.Product;
+import br.com.rchlo.store.domain.ProductImage;
+import br.com.rchlo.store.domain.Size;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ProductDto {
 
@@ -26,6 +31,11 @@ public class ProductDto {
 
     private final Integer weightInGrams;
 
+    private final List<String> imageLinks;
+
+    private final CategoryByPositionDto category;
+
+
     public ProductDto(Product product) {
         this.code = product.getCode();
         this.name = product.getName();
@@ -37,6 +47,8 @@ public class ProductDto {
         this.effectivePrice = this.hasDiscount ? this.originalPrice.subtract(product.getDiscount()) : this.originalPrice;
         this.color = product.getColor().getDescription();
         this.weightInGrams = product.getWeightInGrams();
+        this.imageLinks = product.getImages().stream().map(image -> { return image.getImageUrl(); } ).collect(Collectors.toList());
+        this.category = new CategoryByPositionDto(product.getCategory().getName(), product.getCategory().getSlug());
     }
 
     public Long getCode() {
@@ -77,5 +89,17 @@ public class ProductDto {
 
     public Integer getWeightInGrams() {
         return weightInGrams;
+    }
+
+    public List<String> getImages() {
+        return imageLinks;
+    }
+
+    public CategoryByPositionDto getCategory() {
+        return category;
+    }
+
+    public static List<ProductDto> convertToDto(Page<Product> products) {
+        return products.stream().map(ProductDto::new).collect(Collectors.toList());
     }
 }

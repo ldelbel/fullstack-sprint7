@@ -23,4 +23,42 @@ public class Payment {
     @AttributeOverride(name = "verificationCode", column = @Column(name = "card_verification_code"))
     private Card card;
 
+    public Payment() {}
+
+    public Payment(BigDecimal value, Card card) {
+        this.value = value;
+        this.card = card;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public BigDecimal getValue() {
+        return value;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    public Payment confirmPayment(){
+        if(PaymentStatus.CANCELED.equals(this.status)){
+            throw new IllegalArgumentException("Operação inválida para pagamento cancelado.");
+        }
+        this.status = PaymentStatus.CONFIRMED;
+        return this;
+    }
+
+    public Payment cancelPayment(){
+        if(PaymentStatus.CONFIRMED.equals(this.status)){
+            throw new IllegalArgumentException("Operação inválida para pagamento confirmado.");
+        }
+        this.status = PaymentStatus.CANCELED;
+        return this;
+    }
 }
